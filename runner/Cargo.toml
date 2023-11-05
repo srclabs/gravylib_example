@@ -1,0 +1,13 @@
+[package]
+name = "runner"
+version = "0.0.0"
+publish = false
+edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = ["Dr. Rubisco <doc@thedocruby.dev>"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+gravylib = { path = "../../gravylib" }
+shader = { path = "../shader" }
