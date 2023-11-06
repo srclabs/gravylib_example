@@ -24,7 +24,8 @@ shader!(ocean);
 
 // ** Common
 // Here we declare the common functions and constants
-// NOTE: Any public functions/constants defined here can be used by a dependent crate.
+// NOTE: Any functions/constants that you want to make
+//   available to other crates should be defined as public here
 
 // Imports - functions/constants from other crates
 use core::f32::consts::PI;
@@ -72,14 +73,6 @@ pub fn reflect(ray: Vec3, normal: Vec3) -> Vec3 {
     ray - normal * 2.0 * ray.dot(normal)
 }
 
-fn to_linear_f32(color: f32) -> f32 {
-    if color <= 0.04045 {
-        color / 12.92
-    } else {
-        ((color + 0.055) / 1.055).powf(2.4)
-    }
-}
-
 /// NOTE: This function is for converting particularly stubborn Shadertoy shaders to the proper linear color space.
 ///
 /// If you are porting a a GLSL shader from Shadertoy, and the colors look wrong,
@@ -102,4 +95,12 @@ pub fn to_linear(color: Vec4) -> Vec4 {
         to_linear_f32(color.z),
         color.w,
     )
+}
+
+fn to_linear_f32(color: f32) -> f32 {
+    if color <= 0.04045 {
+        color / 12.92
+    } else {
+        ((color + 0.055) / 1.055).powf(2.4)
+    }
 }
