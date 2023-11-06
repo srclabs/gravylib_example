@@ -11,6 +11,7 @@ const WATER_DEPTH: f32 = 1.0; // how deep is the water
 const CAMERA_HEIGHT: f32 = 1.5; // how high the camera should be
 const ITERATIONS_RAYMARCH: u32 = 12; // waves iterations of raymarching
 const ITERATIONS_NORMAL: u32 = 40; // waves iterations when calculating normals
+const GRAVY_MODE: bool = false; // heheheee
 
 // ** Helpers
 // Calculates wave value and its derivative, 
@@ -76,12 +77,16 @@ fn raymarchwater(camera: Vec3, start: Vec3, end: Vec3, depth: f32, time: f32) ->
 
 // Calculate normal at point by calculating the height at the pos and 2 additional points very close to pos
 fn normal(pos: Vec2, e: f32, depth: f32, time: f32) -> Vec3 {
+  let mut iter = ITERATIONS_NORMAL;
+  if GRAVY_MODE {
+    iter = (iter as f32 * 0.5).round() as u32;
+  }
   let ex = vec2(e, 0.0);
-  let h = getwaves(pos.xy(), ITERATIONS_NORMAL, time) * depth;
+  let h = getwaves(pos.xy(), iter, time) * depth;
   let a = vec3(pos.x, h, pos.y);
 
-  (a - vec3(pos.x - e, getwaves(pos.xy() - ex.xy(), ITERATIONS_NORMAL, time) * depth, pos.y))
-  .cross(a - vec3(pos.x, getwaves(pos.xy() + ex.yx(), ITERATIONS_NORMAL, time) * depth, pos.y + e))
+  (a - vec3(pos.x - e, getwaves(pos.xy() - ex.xy(), iter, time) * depth, pos.y))
+  .cross(a - vec3(pos.x, getwaves(pos.xy() + ex.yx(), iter, time) * depth, pos.y + e))
   .normalize()
 }
 
@@ -210,8 +215,18 @@ pub fn ocean(constants: &Constants, frag_coord: Vec2) -> Vec4 {
   r.y = r.y.abs();
   
   // calculate the reflection and approximate subsurface scattering
-  let reflection = get_atmosphere(r, constants.time) + get_sun(r, constants.time);
-  let scattering = vec3(0.0293, 0.0698, 0.1717) * (0.2 + (water_hit_pos.y + WATER_DEPTH) / WATER_DEPTH);
+  let mut reflection = get_atmosphere(r, constants.time) + get_sun(r, constants.time);
+  if GRAVY_MODE {
+    reflection = saturate3(get_atmosphere(r, constants.time) * 0.15 + get_sun(r, constants.time)) * 2.5;
+  }
+
+  let mut water_color = vec3(0.0293, 0.0698, 0.1717);
+
+  if GRAVY_MODE {
+    water_color = vec3( 0.075, 0.04, 0.0175);
+  }
+  
+  let scattering = water_color * (0.2 + (water_hit_pos.y + WATER_DEPTH) / WATER_DEPTH);
 
   // return the combined result
   let c = fresnel * reflection + (1.0 - fresnel) * scattering;

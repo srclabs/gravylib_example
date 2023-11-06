@@ -45,6 +45,10 @@ pub fn smoothstep(edge0: f32, edge1: f32, x: f32) -> f32 {
     x * x * (3.0 - 2.0 * x)
 }
 
+pub fn saturate3(v: Vec3) -> Vec3 {
+    v.clamp(Vec3::ZERO, Vec3::ONE)
+}
+
 pub fn mix(a: f32, b: f32, t: f32) -> f32 {
     a * (1.0 - t) + b * t
 }
