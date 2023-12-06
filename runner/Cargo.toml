@@ -9,5 +9,5 @@ authors = ["Dr. Rubisco <doc@thedocruby.dev>"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-gravylib = { path = "../../gravylib" }
+gravylib = { path = "../.." }
 shader = { path = "../shader" }
